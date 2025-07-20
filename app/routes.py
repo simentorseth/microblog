@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 from urllib.parse import urlsplit
@@ -79,3 +80,10 @@ def profile(username):
         {'author': user, 'body': 'Test post #2'}
     ]
     return render_template("profile.html", user=user, posts=posts)
+
+
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.now(timezone.utc)
+        db.session.commit()
